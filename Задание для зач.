@@ -1,0 +1,68 @@
+import os
+import datetime
+
+# Функция для вычисления выражения
+def calculate(expression):
+    try:
+        result = eval(expression)
+        return result
+    except (SyntaxError, ZeroDivisionError) as e:
+        return f"Ошибка: {e}"
+
+# Функция для сохранения результата в файл
+def save_to_file(result, file_path="calculator_history.log"):
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(file_path, "a") as f:
+        f.write(f"{timestamp} - {result}\n")
+
+# Функция для вывода истории из файла
+def print_history(file_path="calculator_history.log"):
+    try:
+        with open(file_path, "r") as f:
+            history = f.read()
+            print(history)
+    except FileNotFoundError:
+        print(f"Файл истории '{file_path}' не найден.")
+
+# Основной цикл программы
+while True:
+    # Вывод меню
+    print("\nКалькулятор:")
+    print("1. Вычислить выражение")
+    print("2. Просмотреть историю")
+    print("3. Сохранить историю в файл")
+    print("4. Выход")
+
+    choice = input("Выберите действие: ")
+
+    if choice == '1':
+        expression = input("Введите выражение: ")
+        result = calculate(expression)
+        print(f"Результат: {result}")
+        save_to_file(f"{expression} = {result}")
+
+    elif choice == '2':
+        print("\nИстория вычислений:")
+        print_history()
+
+    elif choice == '3':
+        file_path = input("Введите имя файла для сохранения истории: ")
+        if not file_path:
+            print("Файл не указан. Используется файл по умолчанию: calculator_history.log")
+        elif os.path.isabs(file_path):
+            save_to_file(file_path=file_path)
+            print(f"История сохранена в файл: {file_path}")
+        elif "." in file_path:  # Проверяем наличие расширения
+            file_path = os.path.join(os.getcwd(), file_path)
+            save_to_file(file_path=file_path)
+            print(f"История сохранена в файл: {file_path}")
+        else:
+            file_path = os.path.join(file_path, "log.log")
+            save_to_file(file_path=file_path)
+            print(f"История сохранена в файл: {file_path}")
+    
+    elif choice == '4':
+        break
+
+    else:
+        print("Неверный выбор. Попробуйте снова.")
